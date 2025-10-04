@@ -1,0 +1,10 @@
+environment: staging
+
+config:
+  version: "1.0.0-staging"
+
+ingress:
+  enabled: true
+
+rollout:
+  enabled: true

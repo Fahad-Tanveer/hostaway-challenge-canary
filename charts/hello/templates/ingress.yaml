@@ -1,0 +1,24 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "hello.fullname" . }}
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ include "hello.fullname" . }}
+            port:
+              name: http
+{{- end }}
+
+{{- if and .Values.ingress.enabled .Values.rollout.enabled }}
+{{/* Canary ingress will be managed by Argo Rollouts controller via stableIngress reference */}}
+{{- end }}
+
