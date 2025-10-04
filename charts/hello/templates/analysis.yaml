@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: nginx-success-rate
+spec:
+  args:
+  - name: service-name
+  metrics:
+  - name: success-rate
+    interval: 60s
+    count: 5
+    successCondition: result > 95
+    provider:
+      prometheus:
+        address: "http://prometheus-server.monitoring.svc.cluster.local:9090"
+        query: |
+          (sum(rate(nginx_app_http_response_count_total{status!~"5.."}[5m])) / sum(rate(nginx_app_http_response_count_total[5m]))) * 100
