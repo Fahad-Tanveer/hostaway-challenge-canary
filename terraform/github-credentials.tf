@@ -23,22 +23,22 @@ resource "kubernetes_secret" "github_credentials_argocd" {
 }
 
 # GitHub credentials secret for Kargo
-resource "kubernetes_secret" "github_credentials_kargo" {
-  metadata {
-    name      = "github"
-    namespace = "hello"
-    labels = {
-      "kargo.akuity.io/cred-type" = "git"
-    }
-  }
+# resource "kubernetes_secret" "github_credentials_kargo" {
+#   metadata {
+#     name      = "github"
+#     namespace = "hello"
+#     labels = {
+#       "kargo.akuity.io/cred-type" = "git"
+#     }
+#   }
 
-  data = {
-    repoURL = local.repository_url
-    username = var.github_username
-    password = var.github_pat
-  }
+#   data = {
+#     repoURL = local.repository_url
+#     username = var.github_username
+#     password = var.github_pat
+#   }
 
-  depends_on = [time_sleep.wait_for_kargo_project]
+#   depends_on = [time_sleep.wait_for_kargo_project]
 
-  type = "Opaque"
-}
+#   type = "Opaque"
+# }

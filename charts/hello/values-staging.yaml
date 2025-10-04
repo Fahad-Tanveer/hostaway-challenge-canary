@@ -5,6 +5,7 @@ config:
 
 ingress:
   enabled: true
+  host: hello-staging.local
 
 rollout:
   enabled: true
