@@ -61,6 +61,10 @@ resource "kubectl_manifest" "argocd_project" {
           kind  = "Rollout"
         },
         {
+          group = "argoproj.io"
+          kind  = "AnalysisTemplate"
+        },
+        {
           group = "networking.k8s.io"
           kind  = "Ingress"
         },
