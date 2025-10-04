@@ -22,23 +22,8 @@ spec:
         nginx:
           stableIngress: {{ include "hello.fullname" . }}
       steps:
-      - setWeight: 20
-      - pause: {duration: 30}
-      - analysis:
-          templates:
-          - templateName: nginx-success-rate
-          args:
-          - name: service-name
-            value: hello
       - setWeight: 50
-      - pause: {duration: 60}
-      - analysis:
-          templates:
-          - templateName: nginx-success-rate
-          args:
-          - name: service-name
-            value: hello
-      - setWeight: 100
+      - pause: {}
   template:
     metadata:
       labels:
