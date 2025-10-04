@@ -44,7 +44,7 @@ tolerations: []
 affinity: {}
 
 config:
-  successMessage: "hello its me, I am canary"
+  successMessage: "hello its me, I am testing canary again"
   version: "1.0.0"
 
 environment: staging
