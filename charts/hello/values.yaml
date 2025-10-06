@@ -44,7 +44,7 @@ tolerations: []
 affinity: {}
 
 config:
-  successMessage: "hello this is my 5th commit"
+  successMessage: "hello its me and this is my first commit"
   version: "1.0.0"
 
 environment: staging

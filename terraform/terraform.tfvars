@@ -9,4 +9,4 @@ github_username = "Fahad-Tanveer"
 # Required permissions: repo, read:org
 github_pat = "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"
 
-repository_name = "challenge1"
+repository_name = "hostaway-challenge-canary"
