@@ -154,14 +154,6 @@ curl -H "Host: hello-staging.local" http://localhost:8082/
 
 **Expected Behavior**: You'll see responses from both stable and canary versions as traffic is split 50/50.
 
-#### Integration with Kargo
-
-The canary deployment in staging integrates seamlessly with the Kargo promotion workflow:
-
-1. **Staging Canary**: Use Argo Rollouts for safe canary testing
-2. **Manual Promotion**: After successful canary testing, use Kargo to promote to production
-3. **Production Deployment**: Standard rolling deployment in production environment
-
 This provides the best of both worlds - safe canary deployments in staging with manual control, and streamlined promotion to production via Kargo.
 
 ### 3. Promotion to Production
