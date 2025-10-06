@@ -109,7 +109,92 @@ We use **Kargo** to manage the movement of releases between environments.
 
 ![Pipeline Diagram](images/staging-deployment.png)
 
-### 2. Promotion to Production
+### 2. Canary Deployments in Staging
+
+The staging environment uses **Argo Rollouts** for advanced canary deployment patterns, providing safer deployments with traffic splitting and rollback capabilities.
+
+#### Argo Rollouts Overview
+
+Argo Rollouts is a Kubernetes controller that provides advanced deployment capabilities including:
+- **Canary deployments** with traffic splitting
+- **Blue-green deployments**
+- **Rollback capabilities**
+- **Analysis and validation** (when enabled)
+
+#### Staging Canary Configuration
+
+The `hello-staging` application uses:
+- **Argo Rollouts** for deployment strategy
+- **50% traffic split** between stable and canary versions
+- **Indefinite pause** for manual intervention
+- **NGINX Ingress Controller** for traffic routing
+
+#### Canary Deployment Workflow
+
+1. **Git Push**: Update application code and push to Git repository
+2. **Kargo Promotion**: Use Kargo to promote the latest commit to staging
+3. **Argo CD Sync**: Argo CD syncs the promoted commit to staging namespace
+4. **Rollout Creation**: Argo Rollouts creates new ReplicaSet (canary) alongside stable version
+5. **Traffic Split**: NGINX Ingress routes 50% traffic to canary, 50% to stable
+6. **Pause**: Rollout pauses for testing and validation
+7. **Manual Decision**: Promote to 100% or abort and rollback
+
+#### Monitoring Canary Deployments
+
+**Argo Rollouts Dashboard**:
+```bash
+kubectl argo rollouts dashboard
+# Opens at http://localhost:3100
+```
+
+**View Rollout Status**:
+```bash
+kubectl get rollout -n external-staging-hello -w
+kubectl argo rollouts get rollout hello -n external-staging-hello
+```
+
+#### Manual Rollout Control
+
+**Promote to Production** (after successful canary testing):
+```bash
+kubectl argo rollouts promote hello -n external-staging-hello
+```
+
+**Abort Rollout** (if issues detected):
+```bash
+kubectl argo rollouts abort hello -n external-staging-hello
+```
+
+**View Rollout History**:
+```bash
+kubectl argo rollouts get rollout hello -n external-staging-hello
+```
+
+#### Testing Traffic Splitting
+
+**Port Forward to NGINX Ingress**:
+```bash
+kubectl port-forward -n ingress-nginx svc/ingress-nginx-controller 8082:80
+```
+
+**Test with curl** (during canary deployment):
+```bash
+curl -H "Host: hello-staging.local" http://localhost:8082/
+```
+
+**Expected Behavior**: You'll see responses from both stable and canary versions as traffic is split 50/50.
+
+#### Integration with Kargo
+
+The canary deployment in staging integrates seamlessly with the Kargo promotion workflow:
+
+1. **Staging Canary**: Use Argo Rollouts for safe canary testing
+2. **Manual Promotion**: After successful canary testing, use Kargo to promote to production
+3. **Production Deployment**: Standard rolling deployment in production environment
+
+This provides the best of both worlds - safe canary deployments in staging with manual control, and streamlined promotion to production via Kargo.
+
+### 3. Promotion to Production
 
 - **Promote Upstream:** In the Kargo UI, select the `hello-production` stage.  
 - **Promote:** Click the promotion button and select the upstream stage (`hello-staging`) as the source for the promotion.  
@@ -126,68 +211,6 @@ We use **Kargo** to manage the movement of releases between environments.
 - **Result:** Kargo immediately updates the ArgoCD application to point to the older SHA, initiating a rollback to the previous stable state.  
 
 ![Pipeline Diagram](images/rollback.png)
-
-## Canary Deployments in Staging
-
-The staging environment now uses **Argo Rollouts** for advanced canary deployment patterns, providing safer deployments with traffic splitting and rollback capabilities.
-
-### Argo Rollouts Overview
-
-Argo Rollouts is a Kubernetes controller that provides advanced deployment capabilities including:
-- **Canary deployments** with traffic splitting
-- **Blue-green deployments**
-- **Rollback capabilities**
-- **Analysis and validation** (when enabled)
-
-### Staging Canary Configuration
-
-The `hello-staging` application uses:
-- **Argo Rollouts** for deployment strategy
-- **50% traffic split** between stable and canary versions
-- **Indefinite pause** for manual intervention
-- **NGINX Ingress Controller** for traffic routing
-
-### Canary Deployment Workflow
-
-1. **Git Push**: Update application code and push to Git repository
-2. **Kargo Promotion**: Use Kargo to promote the latest commit to staging
-3. **Argo CD Sync**: Argo CD syncs the promoted commit to staging namespace
-4. **Rollout Creation**: Argo Rollouts creates new ReplicaSet (canary) alongside stable version
-5. **Traffic Split**: NGINX Ingress routes 50% traffic to canary, 50% to stable
-6. **Pause**: Rollout pauses for testing and validation
-7. **Manual Decision**: Promote to 100% or abort and rollback
-
-### Monitoring Canary Deployments
-
-**Argo Rollouts Dashboard**:
-```bash
-kubectl argo rollouts dashboard
-# Opens at http://localhost:3100
-```
-
-### Testing Traffic Splitting
-
-**Port Forward to NGINX Ingress**:
-```bash
-kubectl port-forward -n ingress-nginx svc/ingress-nginx-controller 8082:80
-```
-
-**Test with curl** (during canary deployment):
-```bash
-curl -H "Host: hello-staging.local" http://localhost:8082/
-```
-
-**Expected Behavior**: You'll see responses from both stable and canary versions as traffic is split 50/50.
-
-### Integration with Kargo
-
-The canary deployment in staging integrates seamlessly with the Kargo promotion workflow:
-
-1. **Staging Canary**: Use Argo Rollouts for safe canary testing
-2. **Manual Promotion**: After successful canary testing, use Kargo to promote to production
-3. **Production Deployment**: Standard rolling deployment in production environment
-
-This provides the best of both worlds - safe canary deployments in staging with manual control, and streamlined promotion to production via Kargo.
 
 ## Application Access and Metrics
 
